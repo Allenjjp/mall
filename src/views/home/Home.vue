@@ -28,7 +28,8 @@
   import BackTop from 'components/content/backTop/BackTop'
 
   import {getHomeMultidata, getHomeGoods} from 'network/home';
-  import {debounce} from 'common/utils'
+  import {debounce} from 'common/utils';
+  import {itemListenerMixin} from "common/mixin";
   
 
   export default {
@@ -55,9 +56,11 @@
         currentType: 'pop',
         isShowBackTop: false,
         tabOffsetTop: 612,
-        isTabFixed: false
+        isTabFixed: false,
+        saveY: 0
       }
     },
+    mixins: [itemListenerMixin],
     computed: {
       showGoods() {
         return this.goods[this.currentType].list
@@ -73,13 +76,18 @@
       this.getHomeGoods('sell')
 
     },
-    mounted() {
-      // 1. 图片加载完成的事件监听
-      const refresh = debounce(this.$refs.scroll.refresh)
-      this.$bus.$on('itemImgLoad', () => {
-        refresh()
-      })
+    activated() {
+      this.$refs.scroll.scrollTo(0, this.saveY, 0)
+      this.$refs.scroll.refresh()
+    },
+    deactivated() {
+      // 1. 保存Y值
+      this.saveY = this.$refs.scroll.getScrollY()
 
+      // 2. 取消全局事件的监听
+      this.$bus.$off('itemImgLoad', this.itemImgListener)
+    },
+    mounted() {
     },
     methods: {
       /**
