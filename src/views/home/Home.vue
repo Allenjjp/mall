@@ -25,11 +25,10 @@
   import TabControl from 'components/content/tabControl/TabControl';
   import GoodsList from 'components/content/goods/GoodsList';
   import Scroll from 'components/common/scroll/Scroll';
-  import BackTop from 'components/content/backTop/BackTop'
 
   import {getHomeMultidata, getHomeGoods} from 'network/home';
   import {debounce} from 'common/utils';
-  import {itemListenerMixin} from "common/mixin";
+  import {itemListenerMixin, backTopMixin} from "common/mixin";
   
 
   export default {
@@ -41,8 +40,7 @@
       NavBar,
       TabControl,
       GoodsList,
-      Scroll,
-      BackTop
+      Scroll
     },
     data() {
       return {
@@ -54,13 +52,12 @@
           'sell': { page: 0, list: [] }
         },
         currentType: 'pop',
-        isShowBackTop: false,
         tabOffsetTop: 612,
         isTabFixed: false,
         saveY: 0
       }
     },
-    mixins: [itemListenerMixin],
+    mixins: [itemListenerMixin, backTopMixin],
     computed: {
       showGoods() {
         return this.goods[this.currentType].list
@@ -87,8 +84,6 @@
       // 2. 取消全局事件的监听
       this.$bus.$off('itemImgLoad', this.itemImgListener)
     },
-    mounted() {
-    },
     methods: {
       /**
        * 事件监听的方法
@@ -108,10 +103,6 @@
         this.$refs.tabControl1.currentIndex = index
         this.$refs.tabControl2.currentIndex = index
 
-      },
-
-      backClick() {
-        this.$refs.scroll.scrollTo(0, 0, 500)
       },
 
       contentScroll(position) {
